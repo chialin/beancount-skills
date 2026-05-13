@@ -75,6 +75,10 @@ MIT — see [LICENSE](./LICENSE).
 
 Bug reports, skill ideas, and PRs welcome. The canonical language is English; translations go into their own `<skill>-<lang>` folder (e.g. `weekly-budget-report-zh-TW`).
 
+### Paired-language PR policy
+
+PRs that touch one language folder of a skill **must** also touch the paired variant folder. The `i18n Sync Check` GitHub Action enforces this on every PR. To bypass for a legitimate single-language change (typo fix in one translation, e.g.), add the label `i18n-sync-skip` and justify in the PR description.
+
 ---
 
 ## 繁體中文簡介

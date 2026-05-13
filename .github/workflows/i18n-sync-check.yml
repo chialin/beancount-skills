@@ -1,0 +1,63 @@
+name: i18n Sync Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    paths:
+      - 'weekly-budget-report/**'
+      - 'weekly-budget-report-zh-TW/**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify paired language changes
+        env:
+          LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: |
+          # Skip if i18n-sync-skip label is present (use for legit one-side changes)
+          if echo "$LABELS" | grep -q '"i18n-sync-skip"'; then
+            echo "✓ 'i18n-sync-skip' label present, skipping check."
+            echo "  (Justify in the PR description.)"
+            exit 0
+          fi
+
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          CHANGED=$(git diff --name-only "$BASE" "$HEAD")
+
+          # Skill pairs to enforce. Format: "<english_dir>:<variant_suffix>"
+          # English dir is canonical; variant_suffix is appended (e.g. -zh-TW).
+          PAIRS=(
+            "weekly-budget-report:-zh-TW"
+          )
+
+          fail=0
+          for ENTRY in "${PAIRS[@]}"; do
+            EN_DIR="${ENTRY%%:*}"
+            SUFFIX="${ENTRY##*:}"
+            ZH_DIR="${EN_DIR}${SUFFIX}"
+
+            EN_CHANGED=$(echo "$CHANGED" | grep -E "^${EN_DIR}/" || true)
+            ZH_CHANGED=$(echo "$CHANGED" | grep -E "^${ZH_DIR}/" || true)
+
+            if [ -n "$EN_CHANGED" ] && [ -z "$ZH_CHANGED" ]; then
+              echo "::error::Modified '${EN_DIR}/' but '${ZH_DIR}/' was not touched."
+              echo "::error::Update both folders, or add label 'i18n-sync-skip' (justify in PR description)."
+              fail=1
+            fi
+            if [ -z "$EN_CHANGED" ] && [ -n "$ZH_CHANGED" ]; then
+              echo "::error::Modified '${ZH_DIR}/' but canonical '${EN_DIR}/' was not touched."
+              echo "::error::Update both folders, or add label 'i18n-sync-skip' (justify in PR description)."
+              fail=1
+            fi
+          done
+
+          if [ "$fail" = "0" ]; then
+            echo "✓ Language pairs in sync (or both untouched)."
+          fi
+          exit $fail
