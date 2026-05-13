@@ -68,3 +68,5 @@ Edit `config.json` directly to change output path or budget totals after the ini
 - **Traditional Chinese (zh-TW)**: [`../weekly-budget-report-zh-TW/`](../weekly-budget-report-zh-TW)
 
 PRs welcome for additional languages.
+
+<!-- test: i18n-sync workflow should reject this single-language PR -->
