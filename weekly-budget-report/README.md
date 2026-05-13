@@ -1,6 +1,8 @@
-# Weekly Budget Report Skill
+# Weekly Budget Report Skill (English)
 
 A Claude Code skill that generates weekly budget analysis reports from your beancount file and writes them as markdown to a local folder of your choice (Obsidian vault, plain directory, etc.).
+
+> Looking for the Traditional Chinese version? See [`../weekly-budget-report-zh-TW/`](../weekly-budget-report-zh-TW).
 
 ## Features
 
@@ -8,8 +10,8 @@ A Claude Code skill that generates weekly budget analysis reports from your bean
 - **Top 5 expenses** of the week
 - **Monthly budget tracking** — per-category spend vs. budget
 - **Yearly budget tracking** — YTD progress with timeline comparison
-- **Next week allowance** — how much you can spend per day given remaining budget
-- **AI suggestions** — 2-3 actionable recommendations based on the data
+- **Next week allowance** — how much you can spend per day given the remaining budget
+- **AI suggestions** — 2–3 actionable recommendations based on the data
 
 ## Prerequisites
 
@@ -19,13 +21,21 @@ A Claude Code skill that generates weekly budget analysis reports from your bean
 
 ## Installation
 
-1. Copy `.claude/skills/weekly-budget-report/` into your project's `.claude/skills/`
-2. Add `.claude/skills/weekly-budget-report/config.json` to your `.gitignore`
-3. Run `/weekly-budget-report` — setup wizard kicks in on first run
+```bash
+npx skills add chialin/beancount-skills --skill weekly-budget-report
+```
+
+Then add the generated config to your `.gitignore`:
+
+```
+.claude/skills/weekly-budget-report/config.json
+```
+
+Run `/weekly-budget-report` inside Claude Code — the setup wizard kicks in on first run.
 
 ## Configuration
 
-On first run, a setup wizard asks:
+On first run, a setup wizard asks three questions:
 
 | Field | Default | Notes |
 |-------|---------|-------|
@@ -35,14 +45,14 @@ On first run, a setup wizard asks:
 
 Auto-detected (no questions asked):
 
-- Bean file (`*.bean` in current directory; `main.bean` priority)
-- Currency (read from `option "operating_currency"` in bean file)
+- Bean file (`*.bean` in the current directory; `main.bean` takes priority)
+- Currency (read from `option "operating_currency"` in the bean file)
 - Budget categories (parsed from `budgets.bean` if present)
 
 ## budgets.bean Format
 
 ```
-2024-01-01 custom "budget" Expenses:Food          "monthly"     13000 TWD
+2024-01-01 custom "budget" Expenses:Food           "monthly"    13000 TWD
 2024-01-01 custom "budget" Expenses:Health:Medical "yearly"     42000 TWD
 ```
 
@@ -50,8 +60,11 @@ Without `budgets.bean`, all top-level `Expenses:*` accounts are tracked as month
 
 ## Customization
 
-Edit `config.json` directly to change output path or budget totals after initial setup.
+Edit `config.json` directly to change output path or budget totals after the initial setup.
 
-## Translation
+## Language Variants
 
-Skill output is currently zh-TW. PRs welcome for English / other languages.
+- **English**: this folder (`weekly-budget-report/`) — canonical
+- **Traditional Chinese (zh-TW)**: [`../weekly-budget-report-zh-TW/`](../weekly-budget-report-zh-TW)
+
+PRs welcome for additional languages.

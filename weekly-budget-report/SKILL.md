@@ -1,65 +1,65 @@
 ---
 name: weekly-budget-report
-description: 每週預算分析報表。產出本週花費分析、月累計 vs 預算、年度進度、下週可花參考與 AI 建議，寫入指定本地資料夾。使用 `/weekly-budget-report` 觸發。建議週日晚上記帳後執行。
+description: Weekly budget analysis report. Produces this-week spending, MTD vs. budget, YTD progress, next-week allowance, and AI recommendations; writes to a configured local folder. Trigger with `/weekly-budget-report`. Best run Sunday evening after daily bookkeeping.
 ---
 
-# 每週預算分析報表
+# Weekly Budget Analysis Report
 
-分析本週花費並產出下週預算參考，寫入 config 指定的本地資料夾。
+Analyzes this week's spending and produces a next-week budget reference, writing output to the local folder specified in config.
 
-## 觸發方式
+## Trigger
 
 `/weekly-budget-report`
 
-## 步驟 0：載入或建立 config
+## Step 0: Load or Create Config
 
-### 0a. 檢查 config.json 是否存在
+### 0a. Check Whether config.json Exists
 
-路徑：`.claude/skills/weekly-budget-report/config.json`
+Path: `.claude/skills/weekly-budget-report/config.json`
 
-- 存在 → 用 Read 工具讀取，跳到步驟 0.5
-- 不存在 → 進入 setup wizard（0b）
+- Exists → read with the Read tool, skip to Step 0.5
+- Does not exist → enter setup wizard (0b)
 
 ### 0b. Setup Wizard
 
-執行 0.5 的偵測（bean file、currency、budgets.bean），先一次顯示偵測結果：
+Run the detection from Step 0.5 (bean file, currency, budgets.bean), then display detection results all at once:
 
 ```
-🔍 偵測中...
+🔍 Detecting...
   ✓ Bean file: ./main.bean
   ✓ Currency: TWD
   ✓ Found budgets.bean → N monthly categories, M yearly categories
-    （或：未找到 budgets.bean → 將用所有頂層 Expenses 類別）
+    (or: budgets.bean not found → all top-level Expenses categories will be used)
 ```
 
-**接著逐一詢問三個問題**，每問完一題等使用者回答後再問下一題（不要一次列出 3 題）：
+**Then ask the three questions one at a time**, waiting for the user's answer before asking the next (do not list all 3 at once):
 
-**Q1：** 請輸入週報輸出路徑（本地資料夾或 Obsidian vault 內子目錄）[預設 `./docs/reports/`]：
+**Q1:** Enter the report output path (local folder or subdirectory inside your Obsidian vault) [default `./docs/reports/`]:
 
-→ 等使用者回答後再問 Q2
+→ Wait for the user's answer, then ask Q2
 
-**Q2：** 月度總預算 [預設 X，monthly 類別加總]：
+**Q2:** Total monthly budget [default X, sum of monthly category budgets]:
 
-→ 等使用者回答後再問 Q3
+→ Wait for the user's answer, then ask Q3
 
-**Q3：** 年度總預算 [預設 Y，yearly 類別加總]：
+**Q3:** Total yearly budget [default Y, sum of yearly category budgets]:
 
-→ 收齊後進入 0c
+→ Once all answers are collected, proceed to 0c
 
-**預設值規則：**
+**Default value rules:**
 
-- `output_path`：預設 = `{當前目錄}/docs/reports/`。空白 Enter 用預設。
-- `monthly_budget_total`：預設 = budgets.bean 中 `"monthly"` entries 加總。沒 budgets.bean 時無預設、必填。
-- `yearly_budget_total`：預設 = budgets.bean 中 `"yearly"` entries 加總。沒 budgets.bean 時無預設、必填。
+- `output_path`: default = `{current directory}/docs/reports/`. Press Enter to accept default.
+- `monthly_budget_total`: default = sum of `"monthly"` entries in budgets.bean. No default if budgets.bean is absent — required field.
+- `yearly_budget_total`: default = sum of `"yearly"` entries in budgets.bean. No default if budgets.bean is absent — required field.
 
-### 0c. 寫入 config.json
+### 0c. Write config.json
 
-收齊使用者輸入後：
+After collecting all user input:
 
-1. 若 `output_path` 目錄不存在，用 Bash `mkdir -p` 建立
-2. 用 Write 工具寫入 `.claude/skills/weekly-budget-report/config.json`：
+1. If the `output_path` directory does not exist, create it with Bash `mkdir -p`
+2. Write to `.claude/skills/weekly-budget-report/config.json` using the Write tool:
 
-（若使用者輸入相對路徑，先用 `realpath` 或 `cd ... && pwd` 展開為絕對路徑再寫入）
+(If the user entered a relative path, expand it to an absolute path first using `realpath` or `cd ... && pwd`)
 
 ```json
 {
@@ -69,22 +69,22 @@ description: 每週預算分析報表。產出本週花費分析、月累計 vs 
 }
 ```
 
-3. 顯示確認訊息：`✓ 寫入 config.json`，繼續下一步
+3. Show confirmation: `✓ config.json written`, then continue to the next step
 
-## 步驟 0.5：環境偵測（每次跑都重新做）
+## Step 0.5: Environment Detection (Run Fresh Every Time)
 
-不快取於 config，每次都即時推導。
+Not cached in config — derived live on every run.
 
-### 0.5a. 偵測 bean file
+### 0.5a. Detect Bean File
 
 ```bash
 find . -maxdepth 2 -name '*.bean' -type f
 ```
 
-優先順序：
+Priority order:
 1. `./main.bean`
-2. 第一個找到的 `*.bean`
-3. 找不到 → 詢問使用者並中止
+2. First `*.bean` found
+3. None found → ask the user and abort
 
 ```bash
 if [ -f "./main.bean" ]; then
@@ -94,50 +94,50 @@ else
 fi
 ```
 
-### 0.5b. 偵測 currency
+### 0.5b. Detect Currency
 
-讀取 bean file，搜尋：`option "operating_currency" "XXX"`
+Read the bean file and search for: `option "operating_currency" "XXX"`
 
 ```bash
 grep '^option "operating_currency"' <bean_file> | head -1
 ```
 
-抽出引號內貨幣代碼：
+Extract the currency code from within the quotes:
 
 ```bash
 currency=$(grep '^option "operating_currency"' <bean_file> | sed 's/.*"\([^"]*\)".*/\1/')
 ```
 
-找不到時 fallback 詢問使用者。
+If not found, fall back to asking the user.
 
-### 0.5c. 解析 budgets.bean
+### 0.5c. Parse budgets.bean
 
-檢查專案根目錄是否有 `budgets.bean` 或 `budget.bean`。
+Check whether `budgets.bean` or `budget.bean` exists in the project root.
 
-存在時，用 Read 工具讀取，正則 parse 每行：
+If it exists, read it with the Read tool and regex-parse each line:
 
 ```
 ^\d{4}-\d{2}-\d{2} custom "budget"\s+(\S+)\s+"(monthly|yearly)"\s+([\d,]+\.?\d*)\s+(\w+)
 ```
 
-抽出 `(account, period, amount, currency)`，分成兩個列表：
+Extract `(account, period, amount, currency)` into two lists:
 
-- `monthly_categories`：所有 period == "monthly" 的 entries
-- `yearly_categories`：所有 period == "yearly" 的 entries
+- `monthly_categories`: all entries where period == "monthly"
+- `yearly_categories`: all entries where period == "yearly"
 
-每個 entry 結構：
+Each entry structure:
 ```
 {
-  "name": "Food",                 # account 末段
-  "pattern": "^Expenses:Food",    # 用於 bean-query regex
-  "monthly_budget": 8000,         # 或 yearly_budget
+  "name": "Food",                 # last segment of account
+  "pattern": "^Expenses:Food",    # used as bean-query regex
+  "monthly_budget": 8000,         # or yearly_budget
   "currency": "TWD"
 }
 ```
 
-### 0.5d. Fallback：沒 budgets.bean
+### 0.5d. Fallback: No budgets.bean
 
-執行：
+Run:
 
 ```bash
 bean-query <bean_file> "
@@ -146,31 +146,31 @@ bean-query <bean_file> "
 "
 ```
 
-把結果全當 monthly_categories，每個 entry 沒有 budget 數字（純追蹤花費）。yearly_categories 為空。
+Treat all results as `monthly_categories`; each entry has no budget amount (spending tracking only). `yearly_categories` is empty.
 
-## 設定來源
+## Configuration Sources
 
-所有個人設定來自：
+All personal settings come from:
 
-- **config.json**（步驟 0）：output_path、monthly_budget_total、yearly_budget_total
-- **環境偵測**（步驟 0.5）：bean_file、currency、monthly_categories、yearly_categories
+- **config.json** (Step 0): output_path, monthly_budget_total, yearly_budget_total
+- **Environment detection** (Step 0.5): bean_file, currency, monthly_categories, yearly_categories
 
-## 步驟一：計算日期範圍
+## Step 1: Calculate Date Range
 
-1. 執行 `date +%Y-%m-%d` 取得今天日期
-2. 計算本週一和本週日的日期（ISO 週：週一起始）
-3. 計算 ISO 週數（`date +%V`），用於檔名 `YYYY-WNN.md`
-4. 計算本月剩餘天數
+1. Run `date +%Y-%m-%d` to get today's date
+2. Calculate the dates of this week's Monday and Sunday (ISO week: Monday start)
+3. Calculate the ISO week number (`date +%V`) for the filename `YYYY-WNN.md`
+4. Calculate the number of days remaining in the current month
 
-## 步驟二：查詢本週花費
+## Step 2: Query This Week's Spending
 
-### 2a. 預算類別本週花費（用於表格各列）
+### 2a. Weekly Spending by Budget Category (for each table row)
 
-`<monthly_categories_pattern_alternation>` = 把所有 monthly_categories[i].pattern 用 `|` 串起來。例：`^Expenses:Food|^Expenses:Life`。
+`<monthly_categories_pattern_alternation>` = all monthly_categories[i].pattern joined with `|`. Example: `^Expenses:Food|^Expenses:Life`.
 
 ```bash
-# 使用 alternation regex：把所有 monthly_categories[i].pattern 用 | 串起來
-# （或逐一查詢每個 category 後彙總結果）
+# Use alternation regex: join all monthly_categories[i].pattern with |
+# (or query each category separately and merge results)
 bean-query <bean_file> "
   SELECT account, sum(convert(position, '<currency>')) as total
   WHERE account ~ '<monthly_categories_pattern_alternation>'
@@ -179,9 +179,9 @@ bean-query <bean_file> "
 "
 ```
 
-依 category.pattern 把符合的所有 account 加總到該 category。
+Sum all matching accounts into their respective category based on category.pattern.
 
-### 2b. 本週全類別明細（用於摘要行 + 非預算類別表格）
+### 2b. All-Category Weekly Detail (for summary row + non-budget category table)
 ```bash
 bean-query <bean_file> "
   SELECT account, sum(convert(position, '<currency>')) as total
@@ -192,10 +192,10 @@ bean-query <bean_file> "
 "
 ```
 
-- **本週總花費**（摘要行/概覽）= 全部 Expenses 加總
-- **非預算類別本週花費**（用於下方「非預算中的消費」表格）= 將不屬於 monthly_categories 或 yearly_categories 任一 pattern 的科目單獨列出
+- **Total weekly spending** (summary row / overview) = sum of all Expenses
+- **Non-budget category weekly spending** (for the "Non-Budget Spending" table below) = accounts that do not match any monthly_categories or yearly_categories pattern, listed individually
 
-### 2c. 本週收入（用於本週概覽 / 儲蓄率）
+### 2c. Weekly Income (for Weekly Overview / Savings Rate)
 ```bash
 bean-query <bean_file> "
   SELECT sum(convert(position, '<currency>')) as total
@@ -204,13 +204,13 @@ bean-query <bean_file> "
 "
 ```
 
-注意：bean-query 會把 Income 顯示為負值，取絕對值使用。
+Note: bean-query returns Income as a negative value; take the absolute value.
 
-**儲蓄率** = (本週收入 - 本週支出) / 本週收入 × 100%（取整數）。收入為 0 時不計算。
+**Savings Rate** = (Weekly Income − Weekly Spending) / Weekly Income × 100% (rounded to integer). Skip calculation if income is 0.
 
-## 步驟三：查詢月累計花費
+## Step 3: Query Month-to-Date Spending
 
-### 3a. 各預算類別月累計（用於表格各列）
+### 3a. MTD by Budget Category (for each table row)
 ```bash
 bean-query <bean_file> "
   SELECT account, sum(convert(position, '<currency>')) as total
@@ -220,7 +220,7 @@ bean-query <bean_file> "
 "
 ```
 
-### 3b. 全類別月累計（用於摘要行「月累計 XX,XXX / {monthly_budget_total} {currency}」）
+### 3b. All-Category MTD (for the summary line "MTD XX,XXX / {monthly_budget_total} {currency}")
 ```bash
 bean-query <bean_file> "
   SELECT sum(convert(position, '<currency>')) as total
@@ -229,15 +229,15 @@ bean-query <bean_file> "
 "
 ```
 
-注意：摘要行的月累計應包含**所有** Expenses，不只 monthly_categories 列出的類別。
+Note: the summary line's MTD figure should include **all** Expenses, not only the categories listed in monthly_categories.
 
-## 步驟 3.5：查詢年度預算進度
+## Step 3.5: Query Yearly Budget Progress
 
-僅當 yearly_categories 非空時執行。
+Run only when yearly_categories is non-empty.
 
-### 3.5a. 各 yearly 類別 YTD 花費
+### 3.5a. YTD Spending per Yearly Category
 
-對每個 yearly_categories[i]，查詢：
+For each yearly_categories[i], query:
 
 ```bash
 bean-query <bean_file> "
@@ -247,7 +247,7 @@ bean-query <bean_file> "
 "
 ```
 
-### 3.5b. 各 yearly 類別本週花費
+### 3.5b. This Week's Spending per Yearly Category
 
 ```bash
 bean-query <bean_file> "
@@ -257,24 +257,24 @@ bean-query <bean_file> "
 "
 ```
 
-### 3.5c. 計算每個 yearly 類別的進度
+### 3.5c. Calculate Progress for Each Yearly Category
 
-對每個 category：
+For each category:
 
-- `ytd_used` = 3.5a 結果
-- `weekly_used` = 3.5b 結果
+- `ytd_used` = result from 3.5a
+- `weekly_used` = result from 3.5b
 - `yearly_remaining` = `yearly_budget - ytd_used`
 - `ytd_pct` = `ytd_used / yearly_budget × 100`
-- `timeline_pct` = `current_month / 12 × 100`（顯示「33% (4/12)」）
+- `timeline_pct` = `current_month / 12 × 100` (displayed as "33% (4/12)")
 
-「時程進度」幫助判斷該類別是否落後/超前（理想 ytd_pct ≈ timeline_pct）。
+"Timeline %" helps judge whether a category is behind or ahead (ideal: ytd_pct ≈ timeline_pct).
 
-### 3.5d. yearly 區塊小計
+### 3.5d. Yearly Section Subtotal
 
 - `yearly_subtotal_ytd` = sum of 3.5a results
 - `yearly_subtotal_pct` = `yearly_subtotal_ytd / yearly_budget_total × 100`
 
-## 步驟 3.6：查詢年度全 Expenses 累計
+## Step 3.6: Query Total YTD Expenses
 
 ```bash
 bean-query <bean_file> "
@@ -284,116 +284,116 @@ bean-query <bean_file> "
 "
 ```
 
-- `yearly_total_ytd` = 查詢結果
-- `monthly_avg` = `yearly_total_ytd / current_month`（current_month 為 1-12 的當月月份數）
+- `yearly_total_ytd` = query result
+- `monthly_avg` = `yearly_total_ytd / current_month` (current_month is the current month number, 1–12)
 
-## 步驟四：計算下週預算參考
+## Step 4: Calculate Next Week's Budget Reference
 
-- **月剩餘** = 月預算 - 月累計
-- **剩餘天數** = 本月最後一天 - 今天（從明天算起）
-- **下週可花** = 月剩餘 / 剩餘天數 × 7（若跨月則取到月底天數）
-- **每日可花** = 月剩餘 / 剩餘天數
-- 超支類別不計算下週可花，標記 `⚠️`
+- **Monthly Remaining** = Monthly Budget − MTD
+- **Days Remaining** = last day of month − today (counting from tomorrow)
+- **Next Week Allowance** = Monthly Remaining / Days Remaining × 7 (capped at days until month end if it crosses a month boundary)
+- **Per Day Allowance** = Monthly Remaining / Days Remaining
+- Over-budget categories do not get a next-week calculation; mark with `⚠️`
 
-## 步驟五：產生 AI 建議
+## Step 5: Generate AI Recommendations
 
-根據以下數據產生 2-3 條具體建議：
-- 哪個類別使用率偏高，需要注意
-- 哪個類別進度正常
-- 與上週相比有無異常波動（若可查詢）
+Based on the data below, produce 2–3 concrete recommendations:
+- Which categories have high utilization and need attention
+- Which categories are on track
+- Any unusual spikes compared to last week (if queryable)
 
-## 步驟 5.5：本週前五大支出
+## Step 5.5: Top 5 Expenses This Week
 
-從步驟 2b 的全類別查詢結果中，取金額最大的前 5 筆，無論是否屬於預算類別。
-顯示時 label 用 account 的最後一段（例如 `Expenses:Food:Coffee` 顯示為 `Coffee`）。
+From the all-category query results in Step 2b, take the 5 accounts with the highest amounts, regardless of whether they belong to a budget category.
+Display the label as the last segment of the account path (e.g. `Expenses:Food:Coffee` → `Coffee`).
 
-## 步驟六：寫入輸出檔
+## Step 6: Write Output File
 
-1. 確認 `{config.output_path}` 目錄存在（setup wizard 已建立過，但每次跑保險再 mkdir -p）：
+1. Confirm `{config.output_path}` directory exists (setup wizard already created it, but re-run `mkdir -p` each time as a safeguard):
 ```bash
 mkdir -p "{config.output_path}"
 ```
 
-2. 寫入檔案：`{config.output_path}/YYYY-WNN.md`
+2. Write file: `{config.output_path}/YYYY-WNN.md`
 
-3. 渲染規則：
-   - 若 `yearly_categories` 為空，**省略整個「### 預算內 — 年度」section**（不要輸出空表格）
-   - 若 `monthly_categories` 為空（罕見），月度區塊一樣處理
-   - `{yearly_total_ytd}` / `{monthly_avg}` 來自步驟 3.6
-   - `{top1_label}` 等 = 前五大 account 的末段名稱（同步驟 5.5）
+3. Rendering rules:
+   - If `yearly_categories` is empty, **omit the entire "### Within Budget — Yearly" section** (do not output an empty table)
+   - If `monthly_categories` is empty (rare), handle the monthly block the same way
+   - `{yearly_total_ytd}` / `{monthly_avg}` come from Step 3.6
+   - `{top1_label}` etc. = last segment of the top-five account names (same as Step 5.5)
 
-輸出格式：
+Output format:
 
 ```markdown
-# YYYY-WNN 週預算分析（MM/DD - MM/DD）
+# YYYY-WNN Weekly Budget Analysis (MM/DD - MM/DD)
 
-## 💰 本週概覽
+## 💰 Weekly Overview
 
-| 本週支出 | 儲蓄率 |
-|---------|--------|
+| Weekly Spending | Savings Rate |
+|-----------------|--------------|
 | **XX,XXX {currency}** | **XX%** |
 
-| 本週收入 | 本月累計支出 |
-|---------|-------------|
+| Weekly Income | MTD Spending |
+|---------------|--------------|
 | X,XXX,XXX {currency} | XX,XXX {currency} |
 
-> 本月剩餘 N 天
+> N days left in month
 
-## 🏆 本週前五大支出
+## 🏆 Top 5 Expenses This Week
 
-| 類別 | 金額 |
-|------|------|
+| Category | Amount |
+|----------|--------|
 | {top1_label} | X,XXX {currency} |
 | {top2_label} | X,XXX {currency} |
 | ... | ... |
 
-## 本週花費
+## This Week's Spending
 
-### 預算內 — 月度
+### Within Budget — Monthly
 
-| 類別 | 本週花費 | 月預算 | 月累計 | 月剩餘 | 使用率 |
-|------|---------|--------|--------|--------|-------|
-（依 monthly_categories 動態產生每一列）
+| Category | Week Spend | Monthly Budget | MTD | Remaining | Usage % |
+|----------|------------|----------------|-----|-----------|---------|
+(generated dynamically per monthly_categories)
 
-> 月度小計 X,XXX {currency}｜月累計 XX,XXX / {monthly_budget_total} {currency} (XX%)
+> Monthly subtotal X,XXX {currency}｜MTD XX,XXX / {monthly_budget_total} {currency} (XX%)
 
-### 預算內 — 年度
+### Within Budget — Yearly
 
-（僅當 yearly_categories 非空時呈現此 section）
+(only shown when yearly_categories is non-empty)
 
-| 類別 | 本週 | 年預算 | YTD | 年剩餘 | YTD 使用率 | 時程進度 |
-|------|------|--------|-----|--------|-----------|---------|
-（依 yearly_categories 動態產生每一列）
+| Category | This Week | Annual Budget | YTD | Annual Remaining | YTD % | Timeline % |
+|----------|-----------|---------------|-----|------------------|-------|------------|
+(generated dynamically per yearly_categories)
 
-> 年度小計｜YTD XXX,XXX / {yearly_budget_total} {currency} (XX%)｜時程 XX% (M/12)
+> Yearly subtotal｜YTD XXX,XXX / {yearly_budget_total} {currency} (XX%)｜Timeline XX% (M/12)
 
-### 非預算中的消費
+### Non-Budget Spending
 
-| 類別 | 本週花費 |
-|------|---------|
-（不屬於任何 monthly/yearly category pattern 的 Expenses）
+| Category | Week Spend |
+|----------|------------|
+(Expenses matching neither monthly nor yearly category patterns)
 
-> 非預算小計 X,XXX {currency}
+> Non-budget subtotal X,XXX {currency}
 
-> **本週總花費 XX,XXX {currency}**（含預算內 + 非預算）
+> **Total weekly spending XX,XXX {currency}** (budget + non-budget combined)
 
-## 年度總支出
+## Total Yearly Spending
 
-> 年度總支出 XXX,XXX {currency}｜月平均 XX,XXX {currency}
+> YTD total XXX,XXX {currency}｜Monthly average XX,XXX {currency}
 
-## 下週預算參考
+## Next Week's Budget Reference
 
-| 類別 | 下週可花 | 每日可花 |
-|------|---------|---------|
-（依 monthly_categories 動態產生；超支類別標 ⚠️）
+| Category | Next Week | Per Day |
+|----------|-----------|---------|
+(generated dynamically per monthly_categories; mark over-budget categories with ⚠️)
 
-## 建議
+## Recommendations
 1. ...
 2. ...
 ```
 
-## 步驟七：完成
+## Step 7: Done
 
-寫入檔案後直接結束 skill 即可。
+Once the file is written, the skill exits.
 
-注意：若 `{config.output_path}` 是受 git 管理的目錄，由使用者自行決定是否 commit；skill 不主動 commit。
+Note: if `{config.output_path}` is inside a git-managed directory, it is up to the user to decide whether to commit the file; the skill does not commit automatically.

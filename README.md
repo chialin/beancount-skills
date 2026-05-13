@@ -2,56 +2,56 @@
 
 A collection of [Claude Code](https://claude.ai/code) skills for [Beancount](https://beancount.github.io/) double-entry bookkeeping.
 
-Each skill is self-contained markdown instructions for Claude Code to follow. Drop a skill folder into your project's `.claude/skills/` and trigger it with the slash command.
+Each skill is self-contained markdown instructions for Claude Code to follow. Drop a skill folder into your project's `.claude/skills/` (or install via `npx skills`) and trigger it with the slash command.
 
 ## Available Skills
 
-| Skill | Trigger | What it does |
-|-------|---------|--------------|
-| [weekly-budget-report](./weekly-budget-report) | `/weekly-budget-report` | Generates a weekly budget analysis report from your beancount file (monthly + yearly budget tracking, top-5 expenses, next-week allowance, AI suggestions). Writes markdown to a local folder of your choice. |
+| Skill | Language | Trigger | What it does |
+|-------|----------|---------|--------------|
+| [`weekly-budget-report`](./weekly-budget-report) | English | `/weekly-budget-report` | Weekly budget analysis: monthly + yearly tracking, top-5 expenses, next-week allowance, AI suggestions. |
+| [`weekly-budget-report-zh-TW`](./weekly-budget-report-zh-TW) | 繁體中文 | `/weekly-budget-report` | Same skill, output in Traditional Chinese. |
 
 More skills coming. PRs welcome.
 
 ## Installation
 
-### Option A：用 `npx skills` CLI（推薦）
+### Option A — `npx skills` CLI (recommended)
 
-[`npx skills`](https://github.com/vercel-labs/skills) 是 Vercel Labs 的 skill 安裝工具，會自動把 skill 放到對應位置。
+[`npx skills`](https://github.com/vercel-labs/skills) is the Vercel Labs installer for Claude Code skills. It puts the skill files in the right place automatically.
 
 ```bash
-# 列出本 repo 內可用的 skills
+# List available skills in this repo
 npx skills add chialin/beancount-skills --list
 
-# 安裝特定 skill 到當前專案的 .claude/skills/
+# Install one skill into the current project's .claude/skills/
 npx skills add chialin/beancount-skills --skill weekly-budget-report
 
-# 或安裝全部 skills
+# Or install everything
 npx skills add chialin/beancount-skills --all
 
-# 安裝到全域（~/.claude/skills/，所有專案共用）
+# Install globally (~/.claude/skills/, shared across projects)
 npx skills add chialin/beancount-skills --skill weekly-budget-report -g
 ```
 
-裝完後在 Claude Code 直接打 `/weekly-budget-report` 觸發（首次跑會進 setup wizard）。
+After install, trigger inside Claude Code with `/weekly-budget-report` — the setup wizard runs on first invocation.
 
-### Option B：手動複製
+### Option B — Manual clone & copy
 
 ```bash
-# 在你的 beancount 專案根目錄
 git clone https://github.com/chialin/beancount-skills.git /tmp/beancount-skills
 mkdir -p .claude/skills/
 cp -r /tmp/beancount-skills/weekly-budget-report .claude/skills/
 ```
 
-### 安裝後務必 .gitignore 個人 config
+### Always: gitignore your personal config
 
-每個 skill 第一次跑會在自己資料夾下產生 `config.json`，內含路徑與預算等個人設定。記得加進你的 `.gitignore`：
+Each skill writes a `config.json` (output path, budget totals, etc.) on first run. **Never commit this file.** Add it to your `.gitignore`:
 
 ```
 .claude/skills/<skill-name>/config.json
 ```
 
-每個 skill 資料夾內都有自己的 `README.md`，含詳細 prerequisite 與設定說明。
+Each skill folder ships with its own `README.md` covering prerequisites, configuration, and per-skill details.
 
 ## Prerequisites
 
@@ -61,9 +61,9 @@ cp -r /tmp/beancount-skills/weekly-budget-report .claude/skills/
 
 ## Conventions
 
-- Skills assume your beancount project root is your current working directory.
-- Skills read `option "operating_currency"` from your bean file to determine the display currency (no hardcoded TWD/USD/etc.).
-- If a skill needs budget categories, it parses `budgets.bean` for `custom "budget"` directives. Without `budgets.bean` it falls back to listing all top-level `Expenses:*` accounts.
+- Skills assume the beancount project root is your current working directory.
+- Skills read `option "operating_currency"` from your bean file to determine display currency — no hardcoded TWD/USD/etc.
+- Skills that need budget categories parse `budgets.bean` for `custom "budget"` directives. Without `budgets.bean` they fall back to listing all top-level `Expenses:*` accounts.
 
 See each skill's own README for specifics.
 
@@ -73,4 +73,18 @@ MIT — see [LICENSE](./LICENSE).
 
 ## Contributing
 
-Bug reports, skill ideas, and PRs welcome. Skill output is currently zh-TW; English translation PRs especially welcome.
+Bug reports, skill ideas, and PRs welcome. The canonical language is English; translations go into their own `<skill>-<lang>` folder (e.g. `weekly-budget-report-zh-TW`).
+
+---
+
+## 繁體中文簡介
+
+這是給 [Claude Code](https://claude.ai/code) 用的 [Beancount](https://beancount.github.io/) 複式記帳 skill 集合。每個 skill 是一份 markdown 指令，丟進你專案的 `.claude/skills/`（或用 `npx skills` 安裝）就能用 slash command 觸發。
+
+中文使用者建議裝 `weekly-budget-report-zh-TW` 變體：
+
+```bash
+npx skills add chialin/beancount-skills --skill weekly-budget-report-zh-TW
+```
+
+詳細的中文設定說明見 [`weekly-budget-report-zh-TW/README.md`](./weekly-budget-report-zh-TW/README.md)。
