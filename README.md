@@ -14,23 +14,44 @@ More skills coming. PRs welcome.
 
 ## Installation
 
-For each skill you want to use:
+### Option A：用 `npx skills` CLI（推薦）
 
-1. Copy the skill folder into your beancount project:
-   ```bash
-   # Example for weekly-budget-report
-   mkdir -p .claude/skills/
-   cp -r path/to/beancount-skills/weekly-budget-report .claude/skills/
-   ```
+[`npx skills`](https://github.com/vercel-labs/skills) 是 Vercel Labs 的 skill 安裝工具，會自動把 skill 放到對應位置。
 
-2. Add the per-skill config file to your `.gitignore` (skills generate a local `config.json` on first run that contains personal data):
-   ```
-   .claude/skills/<skill-name>/config.json
-   ```
+```bash
+# 列出本 repo 內可用的 skills
+npx skills add chialin/beancount-skills --list
 
-3. Run the slash command (e.g. `/weekly-budget-report`) inside Claude Code — first run kicks off a setup wizard.
+# 安裝特定 skill 到當前專案的 .claude/skills/
+npx skills add chialin/beancount-skills --skill weekly-budget-report
 
-Each skill folder has its own `README.md` with prerequisites and configuration details.
+# 或安裝全部 skills
+npx skills add chialin/beancount-skills --all
+
+# 安裝到全域（~/.claude/skills/，所有專案共用）
+npx skills add chialin/beancount-skills --skill weekly-budget-report -g
+```
+
+裝完後在 Claude Code 直接打 `/weekly-budget-report` 觸發（首次跑會進 setup wizard）。
+
+### Option B：手動複製
+
+```bash
+# 在你的 beancount 專案根目錄
+git clone https://github.com/chialin/beancount-skills.git /tmp/beancount-skills
+mkdir -p .claude/skills/
+cp -r /tmp/beancount-skills/weekly-budget-report .claude/skills/
+```
+
+### 安裝後務必 .gitignore 個人 config
+
+每個 skill 第一次跑會在自己資料夾下產生 `config.json`，內含路徑與預算等個人設定。記得加進你的 `.gitignore`：
+
+```
+.claude/skills/<skill-name>/config.json
+```
+
+每個 skill 資料夾內都有自己的 `README.md`，含詳細 prerequisite 與設定說明。
 
 ## Prerequisites
 
