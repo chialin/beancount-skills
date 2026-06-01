@@ -6,7 +6,7 @@ A Claude Code skill that generates weekly budget analysis reports from your bean
 
 ## Features
 
-- **Weekly overview** — total spending, savings rate, monthly progress
+- **Weekly overview** — total spending, monthly progress
 - **Top 5 expenses** of the week
 - **Monthly budget tracking** — per-category spend vs. budget
 - **Yearly budget tracking** — YTD progress with timeline comparison

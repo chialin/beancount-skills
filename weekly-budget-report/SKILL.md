@@ -195,7 +195,7 @@ bean-query <bean_file> "
 - **Total weekly spending** (summary row / overview) = sum of all Expenses
 - **Non-budget category weekly spending** (for the "Non-Budget Spending" table below) = accounts that do not match any monthly_categories or yearly_categories pattern, listed individually
 
-### 2c. Weekly Income (for Weekly Overview / Savings Rate)
+### 2c. Weekly Income (for Weekly Overview)
 ```bash
 bean-query <bean_file> "
   SELECT sum(convert(position, '<currency>')) as total
@@ -206,7 +206,6 @@ bean-query <bean_file> "
 
 Note: bean-query returns Income as a negative value; take the absolute value.
 
-**Savings Rate** = (Weekly Income − Weekly Spending) / Weekly Income × 100% (rounded to integer). Skip calculation if income is 0.
 
 ## Step 3: Query Month-to-Date Spending
 
@@ -329,13 +328,9 @@ Output format:
 
 ## 💰 Weekly Overview
 
-| Weekly Spending | Savings Rate |
-|-----------------|--------------|
-| **XX,XXX {currency}** | **XX%** |
-
-| Weekly Income | MTD Spending |
-|---------------|--------------|
-| X,XXX,XXX {currency} | XX,XXX {currency} |
+| Weekly Spending | Weekly Income | MTD Spending |
+|-----------------|---------------|--------------|
+| **XX,XXX {currency}** | X,XXX,XXX {currency} | XX,XXX {currency} |
 
 > N days left in month
 

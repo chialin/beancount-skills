@@ -195,7 +195,7 @@ bean-query <bean_file> "
 - **本週總花費**（摘要行/概覽）= 全部 Expenses 加總
 - **非預算類別本週花費**（用於下方「非預算中的消費」表格）= 將不屬於 monthly_categories 或 yearly_categories 任一 pattern 的科目單獨列出
 
-### 2c. 本週收入（用於本週概覽 / 儲蓄率）
+### 2c. 本週收入（用於本週概覽）
 ```bash
 bean-query <bean_file> "
   SELECT sum(convert(position, '<currency>')) as total
@@ -206,7 +206,6 @@ bean-query <bean_file> "
 
 注意：bean-query 會把 Income 顯示為負值，取絕對值使用。
 
-**儲蓄率** = (本週收入 - 本週支出) / 本週收入 × 100%（取整數）。收入為 0 時不計算。
 
 ## 步驟三：查詢月累計花費
 
@@ -329,13 +328,9 @@ mkdir -p "{config.output_path}"
 
 ## 💰 本週概覽
 
-| 本週支出 | 儲蓄率 |
-|---------|--------|
-| **XX,XXX {currency}** | **XX%** |
-
-| 本週收入 | 本月累計支出 |
-|---------|-------------|
-| X,XXX,XXX {currency} | XX,XXX {currency} |
+| 本週支出 | 本週收入 | 本月累計支出 |
+|---------|---------|-------------|
+| **XX,XXX {currency}** | X,XXX,XXX {currency} | XX,XXX {currency} |
 
 > 本月剩餘 N 天
 
