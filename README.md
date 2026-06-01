@@ -4,6 +4,18 @@ A collection of [Claude Code](https://claude.ai/code) skills for [Beancount](htt
 
 Each skill is self-contained markdown instructions for Claude Code to follow. Drop a skill folder into your project's `.claude/skills/` (or install via `npx skills`) and trigger it with the slash command.
 
+---
+
+這是給 [Claude Code](https://claude.ai/code) 用的 [Beancount](https://beancount.github.io/) 複式記帳 skill 集合。每個 skill 是一份 markdown 指令，丟進你專案的 `.claude/skills/`（或用 `npx skills` 安裝）就能用 slash command 觸發。
+
+中文使用者建議裝 `weekly-budget-report-zh-TW` 變體：
+
+```bash
+npx skills add chialin/beancount-skills --skill weekly-budget-report-zh-TW
+```
+
+詳細的中文設定說明見 [`weekly-budget-report-zh-TW/README.md`](./weekly-budget-report-zh-TW/README.md)。
+
 ## Available Skills
 
 | Skill | Language | Trigger | What it does |
@@ -78,17 +90,3 @@ Bug reports, skill ideas, and PRs welcome. The canonical language is English; tr
 ### Paired-language PR policy
 
 PRs that touch one language folder of a skill **must** also touch the paired variant folder. The `i18n Sync Check` GitHub Action enforces this on every PR. To bypass for a legitimate single-language change (typo fix in one translation, e.g.), add the label `i18n-sync-skip` and justify in the PR description.
-
----
-
-## 繁體中文簡介
-
-這是給 [Claude Code](https://claude.ai/code) 用的 [Beancount](https://beancount.github.io/) 複式記帳 skill 集合。每個 skill 是一份 markdown 指令，丟進你專案的 `.claude/skills/`（或用 `npx skills` 安裝）就能用 slash command 觸發。
-
-中文使用者建議裝 `weekly-budget-report-zh-TW` 變體：
-
-```bash
-npx skills add chialin/beancount-skills --skill weekly-budget-report-zh-TW
-```
-
-詳細的中文設定說明見 [`weekly-budget-report-zh-TW/README.md`](./weekly-budget-report-zh-TW/README.md)。
