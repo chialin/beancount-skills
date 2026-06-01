@@ -8,7 +8,7 @@ Each skill is self-contained markdown instructions for Claude Code to follow. Dr
 
 這是給 [Claude Code](https://claude.ai/code) 用的 [Beancount](https://beancount.github.io/) 複式記帳 skill 集合。每個 skill 是一份 markdown 指令，丟進你專案的 `.claude/skills/`（或用 `npx skills` 安裝）就能用 slash command 觸發。
 
-中文使用者建議裝 `weekly-budget-report-zh-TW` 變體：
+中文使用者建議裝 `weekly-budget-report-zh-TW` 繁中版：
 
 ```bash
 npx skills add chialin/beancount-skills --skill weekly-budget-report-zh-TW
