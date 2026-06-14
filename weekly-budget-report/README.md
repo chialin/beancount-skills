@@ -9,6 +9,8 @@ A Claude Code skill that generates weekly budget analysis reports from your bean
 - **Weekly overview** — total spending, monthly progress
 - **Top 5 expenses** of the week
 - **Monthly budget tracking** — per-category spend vs. budget
+- **Non-budget spending breakdown** — week spend and MTD for expenses outside any budget category
+- **All monthly expenses** — full account-level MTD breakdown (budget + non-budget combined)
 - **Yearly budget tracking** — YTD progress with timeline comparison
 - **Next week allowance** — how much you can spend per day given the remaining budget
 - **AI suggestions** — 2–3 actionable recommendations based on the data

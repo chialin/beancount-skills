@@ -352,6 +352,24 @@ mkdir -p "{config.output_path}"
 
 > 月度小計 X,XXX {currency}｜月累計 XX,XXX / {monthly_budget_total} {currency} (XX%)
 
+### 非預算中的消費
+
+| 類別 | 本週花費 | 月累計 |
+|------|---------|--------|
+（不屬於任何 monthly/yearly category pattern 的 Expenses，顯示本週花費與月累計）
+
+> 非預算小計（本週）X,XXX {currency}｜（月累計）X,XXX {currency}
+
+### 月度全類別消費
+
+本月所有 Expenses 科目明細（含預算內與非預算）：
+
+| 類別 | 月累計 |
+|------|--------|
+（依 bean-query 全 Expenses 月累計結果，按金額降序列出每個 account）
+
+> **月累計總花費 XX,XXX {currency}**（月預算 {monthly_budget_total} {currency}，使用率 XX%）
+
 ### 預算內 — 年度
 
 （僅當 yearly_categories 非空時呈現此 section）
@@ -361,14 +379,6 @@ mkdir -p "{config.output_path}"
 （依 yearly_categories 動態產生每一列）
 
 > 年度小計｜YTD XXX,XXX / {yearly_budget_total} {currency} (XX%)｜時程 XX% (M/12)
-
-### 非預算中的消費
-
-| 類別 | 本週花費 |
-|------|---------|
-（不屬於任何 monthly/yearly category pattern 的 Expenses）
-
-> 非預算小計 X,XXX {currency}
 
 > **本週總花費 XX,XXX {currency}**（含預算內 + 非預算）
 
