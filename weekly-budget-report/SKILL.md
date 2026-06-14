@@ -352,6 +352,24 @@ Output format:
 
 > Monthly subtotal X,XXX {currency}｜MTD XX,XXX / {monthly_budget_total} {currency} (XX%)
 
+### Non-Budget Spending
+
+| Category | Week Spend | MTD |
+|----------|------------|-----|
+(Expenses matching neither monthly nor yearly category patterns; shows both week spend and MTD)
+
+> Non-budget subtotal (this week) X,XXX {currency}｜(MTD) X,XXX {currency}
+
+### All Monthly Expenses
+
+All Expenses accounts for the month (budget and non-budget combined):
+
+| Category | MTD |
+|----------|-----|
+(all Expenses accounts from the full-month bean-query, sorted by amount descending)
+
+> **MTD total XX,XXX {currency}** (monthly budget {monthly_budget_total} {currency}, usage XX%)
+
 ### Within Budget — Yearly
 
 (only shown when yearly_categories is non-empty)
@@ -361,14 +379,6 @@ Output format:
 (generated dynamically per yearly_categories)
 
 > Yearly subtotal｜YTD XXX,XXX / {yearly_budget_total} {currency} (XX%)｜Timeline XX% (M/12)
-
-### Non-Budget Spending
-
-| Category | Week Spend |
-|----------|------------|
-(Expenses matching neither monthly nor yearly category patterns)
-
-> Non-budget subtotal X,XXX {currency}
 
 > **Total weekly spending XX,XXX {currency}** (budget + non-budget combined)
 
